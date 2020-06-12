@@ -8,6 +8,8 @@ TagManager:
   - Obstaculos
   - Powerup
   - Enemigo
+  - CositaBuena
+  - CositaMala
   layers:
   - Default
   - TransparentFX
