@@ -1,51 +1,53 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ControladorJugador : MonoBehaviour
 {
-    private Rigidbody miRigidbody = null;
+    private float horizontalInput;
+    public float velocidad = 10;
+    public float limite = 10;
 
-    public Animator anim = null;
+    public GameObject prefabPizza;
 
-    public float fuerzaDeSalto = 10;
-    public float modificadorGravedad = 1;
+    public Transform padreComida;
 
-    public bool estaPisandoElSuelo = true;
-
-    public bool gameOver = false;
-
-    // ASTERISCO: ESTO ES MUY CARO, TRATAR DE EVITARLO
-    void Start()
-    {
-        miRigidbody = GetComponent<Rigidbody>();
-
-        //Physics.gravity = Physics.gravity * modificadorGravedad;
-        Physics.gravity *= modificadorGravedad;
-    }
-
-    // Update is called once per frame
+    public float margenVertical = 1;
+    
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && estaPisandoElSuelo)
-        {
-            miRigidbody.AddForce(Vector3.up * fuerzaDeSalto, ForceMode.Impulse);
-            estaPisandoElSuelo = false;
-            anim.SetTrigger("Jump_trig");
-        }
-    }
+        #region Movimiento
+        // Lo muevo
+        horizontalInput = Input.GetAxis("Horizontal");
+        transform.Translate( horizontalInput * velocidad 
+                            * Time.deltaTime * Vector3.right);
 
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other.gameObject.CompareTag("Piso"))
+        // No lo dejo ir a la izquierda de la pantalla
+        if (transform.position.x < -limite)
         {
-            estaPisandoElSuelo = true;
+            transform.position = new Vector3(
+                -limite,
+                transform.position.y,
+                transform.position.z);
         }
-        else if (other.gameObject.CompareTag("Obstaculos"))
+        
+        // No lo dejo ir a la derecha de la pantalla
+        if (transform.position.x > limite)
         {
-            gameOver = true;
-            Debug.Log("PERDISTEEEE!   :(");
+            transform.position = new Vector3(
+                limite,
+                transform.position.y,
+                transform.position.z);
         }
+        #endregion
+
+        #region Proyectiles
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Instantiate(prefabPizza,transform.position + Vector3.up * margenVertical,prefabPizza.transform.rotation,padreComida);
+        }
+
+        #endregion
     }
 }
